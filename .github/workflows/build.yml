@@ -1,16 +1,67 @@
-name: Build and Package
+name: Combined Workflows
 
 on:
+  schedule:
+    - cron: '0 0 * * 0'  # Uruchamia się o północy (UTC) w niedzielę
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
+  weekly-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.18.1'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build executable
+      run: npm run build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: build/*.exe
+
+  on-push-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.18.1'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build executable
+      run: npm run build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: build/*.exe
+
+  manual-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout repository
