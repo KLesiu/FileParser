@@ -39,21 +39,14 @@ const ext = path.extname(inputFile).toLowerCase();
 // Funkcja do konwersji na format XML
 function toXML(obj) {
     const builder = new xml2js.Builder();
-    return builder.buildObject(obj);
+    const xml = builder.buildObject({ data: obj }); // Dodanie korzenia "data" dla xml2js
+    return xml;
 }
 
 // Funkcja do konwersji na format JSON
 function toJSON(obj) {
     return JSON.stringify(obj, null, 2);
 }
-
-
-// Zapisanie wyniku do pliku wyjściowego
-const outputFile = inputFile.replace(ext, `.${outputFormat}`);
-fs.writeFileSync(outputFile, outputContent, 'utf8');
-console.log(`Converted ${inputFile} to ${outputFile}`);
-
-
 
 // Funkcja do konwersji na format YAML
 function toYAML(obj) {
@@ -70,31 +63,80 @@ switch (ext) {
                 process.exit(1);
             }
             parsedData = result;
+
+            // Konwersja na żądany format po zakończeniu parsowania
+            switch (outputFormat) {
+                case 'xml':
+                    const xmlOutput = toXML(parsedData);
+                    const outputFile = inputFile.replace(ext, `.${outputFormat}`);
+                    fs.writeFileSync(outputFile, xmlOutput, 'utf8');
+                    console.log(`Converted ${inputFile} to ${outputFile}`);
+                    break;
+                case 'json':
+                    const jsonOutput = toJSON(parsedData);
+                    const jsonOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                    fs.writeFileSync(jsonOutputFile, jsonOutput, 'utf8');
+                    console.log(`Converted ${inputFile} to ${jsonOutputFile}`);
+                    break;
+                case 'yml':
+                    const yamlOutput = toYAML(parsedData);
+                    const yamlOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                    fs.writeFileSync(yamlOutputFile, yamlOutput, 'utf8');
+                    console.log(`Converted ${inputFile} to ${yamlOutputFile}`);
+                    break;
+            }
         });
         break;
     case '.json':
         parsedData = JSON.parse(inputContent);
+        // W przypadku pliku JSON, konwersja do innych formatów bezpośrednio
+        switch (outputFormat) {
+            case 'xml':
+                const xmlOutput = toXML(parsedData);
+                const outputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(outputFile, xmlOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${outputFile}`);
+                break;
+            case 'json':
+                const jsonOutput = toJSON(parsedData);
+                const jsonOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(jsonOutputFile, jsonOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${jsonOutputFile}`);
+                break;
+            case 'yml':
+                const yamlOutput = toYAML(parsedData);
+                const yamlOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(yamlOutputFile, yamlOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${yamlOutputFile}`);
+                break;
+        }
         break;
     case '.yml':
     case '.yaml':
         parsedData = yaml.load(inputContent);
+        // W przypadku pliku YAML, konwersja do innych formatów bezpośrednio
+        switch (outputFormat) {
+            case 'xml':
+                const xmlOutput = toXML(parsedData);
+                const outputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(outputFile, xmlOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${outputFile}`);
+                break;
+            case 'json':
+                const jsonOutput = toJSON(parsedData);
+                const jsonOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(jsonOutputFile, jsonOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${jsonOutputFile}`);
+                break;
+            case 'yml':
+                const yamlOutput = toYAML(parsedData);
+                const yamlOutputFile = inputFile.replace(ext, `.${outputFormat}`);
+                fs.writeFileSync(yamlOutputFile, yamlOutput, 'utf8');
+                console.log(`Converted ${inputFile} to ${yamlOutputFile}`);
+                break;
+        }
         break;
     default:
         console.error('Error: Unsupported input file format. Supported formats are: .xml, .json, .yml');
         process.exit(1);
 }
-
-// Konwersja na żądany format
-let outputContent;
-switch (outputFormat) {
-    case 'xml':
-        outputContent = toXML(parsedData);
-        break;
-    case 'json':
-        outputContent = toJSON(parsedData);
-        break;
-    case 'yml':
-        outputContent = toYAML(parsedData);
-        break;
-}
-

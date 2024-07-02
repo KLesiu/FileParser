@@ -10,7 +10,7 @@ on:
 
 jobs:
   setup-and-build:
-    runs-on: ubuntu-latest  # Ustawienie domyślnego serwera Ubuntu
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -20,7 +20,9 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18.18.1'
-
+    - name: Grant execute permission to installResources.sh
+      run: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process; ./installResources.sh
+      
     - name: Use Bash shell
       shell: bash
       run: |
