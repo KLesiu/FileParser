@@ -32,3 +32,61 @@ if (!validFormats.includes(outputFormat)) {
     process.exit(1);
 }
 
+// Wczytanie pliku wejściowego
+const inputContent = fs.readFileSync(inputFile, 'utf8');
+const ext = path.extname(inputFile).toLowerCase();
+
+// Funkcja do konwersji na format XML
+function toXML(obj) {
+    const builder = new xml2js.Builder();
+    return builder.buildObject(obj);
+}
+
+// Funkcja do konwersji na format JSON
+function toJSON(obj) {
+    return JSON.stringify(obj, null, 2);
+}
+
+// Funkcja do konwersji na format YAML
+function toYAML(obj) {
+    return yaml.dump(obj);
+}
+
+// Parsowanie i konwersja
+let parsedData;
+switch (ext) {
+    case '.xml':
+        xml2js.parseString(inputContent, (err, result) => {
+            if (err) {
+                console.error('Error parsing XML:', err);
+                process.exit(1);
+            }
+            parsedData = result;
+        });
+        break;
+    case '.json':
+        parsedData = JSON.parse(inputContent);
+        break;
+    case '.yml':
+    case '.yaml':
+        parsedData = yaml.load(inputContent);
+        break;
+    default:
+        console.error('Error: Unsupported input file format. Supported formats are: .xml, .json, .yml');
+        process.exit(1);
+}
+
+// Konwersja na żądany format
+let outputContent;
+switch (outputFormat) {
+    case 'xml':
+        outputContent = toXML(parsedData);
+        break;
+    case 'json':
+        outputContent = toJSON(parsedData);
+        break;
+    case 'yml':
+        outputContent = toYAML(parsedData);
+        break;
+}
+
