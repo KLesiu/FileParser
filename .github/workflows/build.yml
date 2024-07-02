@@ -9,9 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  weekly-build:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+  setup-and-build:
+    runs-on: ubuntu-latest  # Ustawienie domyślnego serwera Ubuntu
 
     steps:
     - name: Checkout repository
@@ -22,58 +21,11 @@ jobs:
       with:
         node-version: '18.18.1'
 
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build executable
-      run: npm run build
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: executable
-        path: build/*.exe
-
-  on-push-build:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.18.1'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build executable
-      run: npm run build
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: executable
-        path: build/*.exe
-
-  manual-build:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.18.1'
-
-    - name: Install dependencies
-      run: npm install
+    - name: Use Bash shell
+      shell: bash
+      run: |
+        # Uruchomienie skryptu installResources.sh znajdującego się w repozytorium
+        ./installResources.sh
 
     - name: Build executable
       run: npm run build
