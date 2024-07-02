@@ -47,6 +47,14 @@ function toJSON(obj) {
     return JSON.stringify(obj, null, 2);
 }
 
+
+// Zapisanie wyniku do pliku wyjściowego
+const outputFile = inputFile.replace(ext, `.${outputFormat}`);
+fs.writeFileSync(outputFile, outputContent, 'utf8');
+console.log(`Converted ${inputFile} to ${outputFile}`);
+
+
+
 // Funkcja do konwersji na format YAML
 function toYAML(obj) {
     return yaml.dump(obj);
